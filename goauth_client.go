@@ -66,7 +66,7 @@ func main() {
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
-	bHTML, _ := os.ReadFile("static/html/home.html")
+	bHTML, _ := os.ReadFile("static/html/home.go.html")
 
 	data := struct {
 		AuthServer string
@@ -108,14 +108,14 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	if errorVal != "" {
-		bHtml, err = os.ReadFile("static/html/callback_error.html")
+		bHtml, err = os.ReadFile("static/html/callback_error.go.html")
 		if err != nil {
 			log.Println(err)
 			w.Write([]byte(err.Error()))
 			return
 		}
 	} else {
-		bHtml, err = os.ReadFile("static/html/callback_success.html")
+		bHtml, err = os.ReadFile("static/html/callback_success.go.html")
 		if err != nil {
 			log.Println(err)
 			w.Write([]byte(err.Error()))
