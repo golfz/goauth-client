@@ -23,17 +23,22 @@
             vertical-align: top;
         }
 
-        input[type=text] {
+        input[type=text], textarea {
             width: 50em;
             padding: 6px 10px;
             margin: 4px 0;
             box-sizing: border-box;
             font-family: 'DM Mono', monospace;
+            border: #777 1px solid;
         }
 
         input[name="code"], input[name="state"] {
             background-color: lightgreen;
             font-weight: bold;
+        }
+
+        table#table_error input {
+            background-color: mistyrose;
         }
 
         .btn {
@@ -211,7 +216,41 @@
     </tr>
 </table>
 
+<table id="table_error">
+    <tr>
+        <td>
+            <label for="error">error</label>
+        </td>
+        <td>
+            <input type="text" id="error" name="error" placeholder=""
+                   value="">
+        </td>
+    </tr>
+    <tr>
+        <td class="v-align-top">
+            <label for="error_description">error_description</label>
+        </td>
+        <td>
+            <textarea id="error_description" name="error_description" rows="10" cols="88" disabled></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="error_uri">error_uri</label>
+        </td>
+        <td>
+            <input type="text" id="error_uri" name="error_uri" placeholder=""
+                   value="">
+        </td>
+    </tr>
+</table>
+
 <script>
+    function hiddenTokenResponseTable() {
+        document.getElementById("table_token").style.display = "none";
+        document.getElementById("table_error").style.display = "none";
+    }
+
     document.getElementById("btn_get_token").onclick = function () {
         let token_endpoint = document.getElementById("token_endpoint").value;
 
@@ -226,6 +265,8 @@
         xhr.open("POST", token_endpoint, true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onreadystatechange = function () {
+            hiddenTokenResponseTable();
+
             if (xhr.readyState === 4 && xhr.status === 200) {
                 var response = JSON.parse(xhr.response);
                 console.log(response);
@@ -237,8 +278,17 @@
                 document.getElementById("token_type").value = response.token_type;
                 document.getElementById("custom_parameter").value = response.custom_parameter;
 
+                document.getElementById("table_token").style.display = "table";
+
             } else if (xhr.readyState === 4 && xhr.status !== 200) {
-                alert("Get token failed");
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("error").value = response.error;
+                document.getElementById("error_description").value = response.error_description;
+                document.getElementById("error_uri").value = response.error_uri === undefined ? '' : response.error_uri;
+
+                document.getElementById("table_error").style.display = "table";
             }
         };
 
@@ -275,6 +325,8 @@
 
         return false;
     };
+
+    hiddenTokenResponseTable();
 </script>
 </body>
 </html>

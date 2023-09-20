@@ -23,17 +23,20 @@
             vertical-align: top;
         }
 
-        input[type=text] {
+        input, textarea {
+            border: #777 1px solid;
+        }
+
+        input[type=text], textarea {
             width: 50em;
             padding: 6px 10px;
             margin: 4px 0;
             box-sizing: border-box;
             font-family: 'DM Mono', monospace;
+            background-color: mistyrose;
         }
 
-        input {
-            background-color: mistyrose;
-            font-weight: bold;
+        input, textarea {
         }
 
         .btn {
@@ -67,11 +70,11 @@
         </td>
     </tr>
     <tr>
-        <td>
+        <td class="v-align-top">
             <label for="error_description">error_description</label>
         </td>
         <td>
-            <input type="text" id="error_description" name="error_description" value="{{ .ErrorDescription }}" disabled>
+            <textarea id="error_description" name="error_description" rows="10" cols="88" disabled>{{ .ErrorDescription }}</textarea>
         </td>
     </tr>
     <tr>
