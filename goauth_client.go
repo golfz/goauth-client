@@ -83,31 +83,53 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	code := r.FormValue("code")
 	state := r.FormValue("state")
+	errorVal := r.FormValue("error")
+	errorDescription := r.FormValue("error_description")
+	errorURI := r.FormValue("error_uri")
 
-	bHtml, err := os.ReadFile("static/html/callback_success.html")
-	if err != nil {
-		log.Println(err)
-		w.Write([]byte(err.Error()))
-		return
+	var bHtml []byte
+	var err error
+
+	if errorVal != "" {
+		bHtml, err = os.ReadFile("static/html/callback_error.html")
+		if err != nil {
+			log.Println(err)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	} else {
+		bHtml, err = os.ReadFile("static/html/callback_success.html")
+		if err != nil {
+			log.Println(err)
+			w.Write([]byte(err.Error()))
+			return
+		}
 	}
+
 	data := struct {
-		Code         string
-		State        string
-		TokenServer  string
-		ClientID     string
-		ClientSecret string
-		CallbackURL  string
-		CodeVerifier string
-		GrantType    string
+		Code             string
+		State            string
+		TokenServer      string
+		ClientID         string
+		ClientSecret     string
+		CallbackURL      string
+		CodeVerifier     string
+		GrantType        string
+		Error            string
+		ErrorDescription string
+		ErrorURI         string
 	}{
-		Code:         code,
-		State:        state,
-		TokenServer:  tokenServer,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		CallbackURL:  callbackURL,
-		CodeVerifier: codeVerifier,
-		GrantType:    grantType,
+		Code:             code,
+		State:            state,
+		TokenServer:      tokenServer,
+		ClientID:         clientID,
+		ClientSecret:     clientSecret,
+		CallbackURL:      callbackURL,
+		CodeVerifier:     codeVerifier,
+		GrantType:        grantType,
+		Error:            errorVal,
+		ErrorDescription: errorDescription,
+		ErrorURI:         errorURI,
 	}
 
 	tpl, err := template.New("callback").Parse(string(bHtml))
