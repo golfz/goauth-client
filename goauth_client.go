@@ -23,10 +23,25 @@ const (
 	codeVerifier = "f52g787EWIcyOK3jZiE8nYzRsv3kLEZ9vsJVcQDyfVE"
 	callbackURL  = "http://localhost:8080/callback"
 
-	clientID     = "web_public"
-	clientSecret = "web_public_secret"
-	grantType    = "authorization_code"
+	grantType = "authorization_code"
 )
+
+var clients = []struct {
+	ClientType   string
+	ClientID     string
+	ClientSecret string
+}{
+	{
+		ClientType:   "Public Client",
+		ClientID:     "web_public",
+		ClientSecret: "web_public_secret",
+	},
+	{
+		ClientType:   "Credential Client",
+		ClientID:     "web_credential",
+		ClientSecret: "web_credential_secret",
+	},
+}
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
@@ -54,18 +69,20 @@ func home(w http.ResponseWriter, r *http.Request) {
 	bHTML, _ := os.ReadFile("static/html/home.html")
 
 	data := struct {
-		AuthServer    string
-		ClientID      string
-		ClientSecret  string
+		AuthServer string
+		Clients    []struct {
+			ClientType   string
+			ClientID     string
+			ClientSecret string
+		}
 		CodeChallenge string
 		CallbackURL   string
 	}{
 		AuthServer:    authServer,
-		ClientID:      clientID,
-		ClientSecret:  clientSecret,
 		CodeChallenge: getCodeChallenge(codeVerifier),
 		CallbackURL:   callbackURL,
 	}
+	data.Clients = clients
 
 	tpl, err := template.New("home").Parse(string(bHTML))
 	if err != nil {
@@ -107,11 +124,14 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Code             string
-		State            string
-		TokenServer      string
-		ClientID         string
-		ClientSecret     string
+		Code        string
+		State       string
+		TokenServer string
+		Clients     []struct {
+			ClientType   string
+			ClientID     string
+			ClientSecret string
+		}
 		CallbackURL      string
 		CodeVerifier     string
 		GrantType        string
@@ -122,8 +142,6 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		Code:             code,
 		State:            state,
 		TokenServer:      tokenServer,
-		ClientID:         clientID,
-		ClientSecret:     clientSecret,
 		CallbackURL:      callbackURL,
 		CodeVerifier:     codeVerifier,
 		GrantType:        grantType,
@@ -131,6 +149,7 @@ func callback(w http.ResponseWriter, r *http.Request) {
 		ErrorDescription: errorDescription,
 		ErrorURI:         errorURI,
 	}
+	data.Clients = clients
 
 	tpl, err := template.New("callback").Parse(string(bHtml))
 	if err != nil {
