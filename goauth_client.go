@@ -17,8 +17,8 @@ import (
 const (
 	servicePort = "8080"
 
-	authServer  = "http://localhost:5000/oauth/v2/authorize"
-	tokenServer = "http://localhost:5000/oauth/v2/token"
+	authServer  = "http://localhost/oauth/v2/authorize"
+	tokenServer = "http://localhost/oauth/v2/token"
 
 	codeVerifier = "f52g787EWIcyOK3jZiE8nYzRsv3kLEZ9vsJVcQDyfVE"
 	callbackURL  = "http://localhost:8080/callback"
