@@ -6,24 +6,19 @@ import (
 	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
 const (
-	servicePort = "8080"
-
-	authServer  = "http://localhost/oauth/v2/authorize"
-	tokenServer = "http://localhost/oauth/v2/token"
-
 	codeVerifier = "f52g787EWIcyOK3jZiE8nYzRsv3kLEZ9vsJVcQDyfVE"
-	callbackURL  = "http://localhost:8080/callback"
-
-	grantType = "authorization_code"
+	grantType    = "authorization_code"
 )
 
 var clients = []struct {
@@ -43,8 +38,23 @@ var clients = []struct {
 	},
 }
 
+func initConfig() {
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds | log.Lshortfile)
+
+	initConfig()
 
 	r := mux.NewRouter()
 
@@ -56,12 +66,12 @@ func main() {
 	methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST" /*"PUT", "PATCH", "DELETE",*/, "OPTIONS"})
 
 	sv := http.Server{
-		Addr:         fmt.Sprintf(":%s", servicePort),
+		Addr:         fmt.Sprintf(":%v", viper.GetInt("app.port")),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 5 * time.Second,
 		Handler:      handlers.CORS(originsOk, headersOk, methodsOk)(r),
 	}
-	log.Printf("Listening on port %s...\n", servicePort)
+	log.Printf("Listening on port %v...\n", viper.GetInt("app.port"))
 	log.Panic(sv.ListenAndServe())
 }
 
@@ -78,9 +88,9 @@ func home(w http.ResponseWriter, r *http.Request) {
 		CodeChallenge string
 		CallbackURL   string
 	}{
-		AuthServer:    authServer,
+		AuthServer:    viper.GetString("auth.server"),
 		CodeChallenge: getCodeChallenge(codeVerifier),
-		CallbackURL:   callbackURL,
+		CallbackURL:   viper.GetString("app.callback_url"),
 	}
 	data.Clients = clients
 
@@ -141,8 +151,8 @@ func callback(w http.ResponseWriter, r *http.Request) {
 	}{
 		Code:             code,
 		State:            state,
-		TokenServer:      tokenServer,
-		CallbackURL:      callbackURL,
+		TokenServer:      viper.GetString("token.server"),
+		CallbackURL:      viper.GetString("app.callback_url"),
 		CodeVerifier:     codeVerifier,
 		GrantType:        grantType,
 		Error:            errorVal,
