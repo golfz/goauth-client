@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Callback Success</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Sarabun:ital@1&display=swap" rel="stylesheet">
@@ -184,9 +185,10 @@
 
 <h3 style="margin-top: 2em;">
     Token
-    <a class="btn" id="btn_get_token" href="#">Get Token</a>
+    <a id="btn_get_token" class="btn rounded-md" href="#">Get Token with Authorization Code (code)</a>
+    <a id="btn_get_with_refresh" class="hidden ml-2 border p-2 pl-6 pr-6 rounded-md bg-violet-300 hover:bg-violet-600 border-violet-600 text-violet-900 hover:text-white font-bold" href="#">Get Token with Refresh Token</a>
 </h3>
-<table id="table_token">
+<table id="table_token" class="mt-4">
     <tr>
         <td class="v-align-top">
             <label for="access_token">Access Token</label>
@@ -241,7 +243,7 @@
     </tr>
 </table>
 
-<table id="table_error">
+<table id="table_error" class="mt-4">
     <tr>
         <td>
             <label for="error">error</label>
@@ -324,6 +326,7 @@
                 document.getElementById("custom_parameter").value = response.custom_parameter;
 
                 document.getElementById("table_token").style.display = "table";
+                document.getElementById("btn_get_with_refresh").style.display = "inline";
 
             } else if (xhr.readyState === 4 && xhr.status !== 200) {
                 var response = JSON.parse(xhr.response);
@@ -373,6 +376,53 @@
 
         return false;
     };
+
+    document.getElementById("btn_get_with_refresh").onclick = function () {
+        let token_endpoint = document.getElementById("token_endpoint").value;
+
+        let grant_type = "refresh_token";
+        let refresh_token = document.getElementById("refresh_token").value;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", token_endpoint, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            hiddenTokenResponseTable();
+
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("access_token").value = response.access_token;
+                document.getElementById("refresh_token").value = response.refresh_token;
+                document.getElementById("expires_in").value = response.expires_in;
+                document.getElementById("scope").value = response.scope;
+                document.getElementById("token_type").value = response.token_type;
+                document.getElementById("custom_parameter").value = response.custom_parameter;
+
+                document.getElementById("table_token").style.display = "table";
+                document.getElementById("btn_get_with_refresh").style.display = "inline";
+
+            } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("error").value = response.error;
+                document.getElementById("error_description").value = response.error_description;
+                document.getElementById("error_uri").value = response.error_uri === undefined ? '' : response.error_uri;
+
+                document.getElementById("table_error").style.display = "table";
+            }
+        };
+
+        let requestBody = ''
+        requestBody += 'grant_type=' + encodeURI(grant_type);
+        requestBody += '&refresh_token=' + encodeURI(refresh_token);
+        
+        xhr.send(requestBody);
+
+        return false;
+    }
 
     document.getElementById("client_type").addEventListener('change', (event) => {
         fnSetClient();
