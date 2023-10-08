@@ -186,7 +186,9 @@
 <h3 style="margin-top: 2em;">
     Token
     <a id="btn_get_token" class="btn rounded-md" href="#">Get Token with Authorization Code (code)</a>
-    <a id="btn_get_with_refresh" class="hidden ml-2 border p-2 pl-6 pr-6 rounded-md bg-violet-300 hover:bg-violet-600 border-violet-600 text-violet-900 hover:text-white font-bold" href="#">Get Token with Refresh Token</a>
+    <a id="btn_get_with_refresh"
+       class="hidden ml-2 border p-2 pl-6 pr-6 rounded-md bg-violet-300 hover:bg-violet-600 border-violet-600 text-violet-900 hover:text-white font-bold"
+       href="#">Get Token with Refresh Token</a>
 </h3>
 <table id="table_token" class="mt-4">
     <tr>
@@ -274,7 +276,11 @@
 
 <script>
     let clients = [];
-    {{ range .Clients }}
+    {
+        {
+            range.Clients
+        }
+    }
     clients.push(
         {
             client_type: '{{ .ClientType }}',
@@ -282,7 +288,11 @@
             client_secret: '{{ .ClientSecret }}',
         }
     )
-    {{ end }}
+    {
+        {
+            end
+        }
+    }
 
     let fnSetClient = function () {
         let client_type = document.getElementById("client_type").value;
@@ -356,15 +366,21 @@
             }
             requestBody += 'redirect_uri=' + encodeURI(redirect_uri);
         }
-        if (document.getElementById("use_client_id").checked) {
+
+        // client authentication
+        if (document.getElementById("use_client_secret").checked) {
+            // confidential
+            if (client_secret !== '') {
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(client_id + ":" + client_secret));
+            }
+
+        } else if (document.getElementById("use_client_id").checked) { // public client
             if (requestBody !== '') {
                 requestBody += '&';
             }
             requestBody += 'client_id=' + encodeURI(client_id);
         }
-        if (document.getElementById("use_client_secret").checked) {
-            xhr.setRequestHeader("Authorization", "Basic " + btoa(client_id + ":" + client_secret));
-        }
+
         if (document.getElementById("use_code_verifier").checked) {
             if (requestBody !== '') {
                 requestBody += '&';
@@ -418,7 +434,8 @@
         let requestBody = ''
         requestBody += 'grant_type=' + encodeURI(grant_type);
         requestBody += '&refresh_token=' + encodeURI(refresh_token);
-        
+        requestBody += '&client_id=' + encodeURI(document.getElementById("client_id").value);
+
         xhr.send(requestBody);
 
         return false;
