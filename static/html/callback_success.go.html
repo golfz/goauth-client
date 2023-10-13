@@ -276,11 +276,7 @@
 
 <script>
     let clients = [];
-    {
-        {
-            range.Clients
-        }
-    }
+    {{ range .Clients }}
     clients.push(
         {
             client_type: '{{ .ClientType }}',
@@ -288,11 +284,7 @@
             client_secret: '{{ .ClientSecret }}',
         }
     )
-    {
-        {
-            end
-        }
-    }
+    {{ end }}
 
     let fnSetClient = function () {
         let client_type = document.getElementById("client_type").value;
@@ -434,7 +426,10 @@
         let requestBody = ''
         requestBody += 'grant_type=' + encodeURI(grant_type);
         requestBody += '&refresh_token=' + encodeURI(refresh_token);
-        requestBody += '&client_id=' + encodeURI(document.getElementById("client_id").value);
+
+        if (document.getElementById("use_client_id").checked) { // public client
+            requestBody += '&client_id=' + encodeURI(document.getElementById("client_id").value);
+        }
 
         xhr.send(requestBody);
 
