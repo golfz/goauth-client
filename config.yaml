@@ -3,8 +3,10 @@ app:
   callback_url: "http://localhost:8080/callback"
 
 auth:
-  server: "http://localhost:80/oauth/v2/authorize"
+#  server: "http://localhost:80/oauth/v2/authorize"
+  server: "https://auth-dev.mastertime.io/oauth/v2/authorize"
 
 token:
-  server: "http://localhost/oauth/v2/token"
+#  server: "http://localhost/oauth/v2/token"
+  server: "https://auth-dev.mastertime.io/oauth/v2/token"
 
