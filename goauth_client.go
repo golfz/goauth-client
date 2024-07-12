@@ -71,7 +71,7 @@ func main() {
 		WriteTimeout: 5 * time.Second,
 		Handler:      handlers.CORS(originsOk, headersOk, methodsOk)(r),
 	}
-	log.Printf("Listening on port %v...\n", viper.GetInt("app.port"))
+	log.Printf("Listening on port %v..., http://localhost:%v/home\n", viper.GetInt("app.port"), viper.GetInt("app.port"))
 	log.Panic(sv.ListenAndServe())
 }
 
