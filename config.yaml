@@ -1,16 +1,16 @@
 app:
-  port: 18080
-  callback_url: "http://localhost:18080/callback"
+  port: 8080
+  callback_url: "http://localhost:8080/callback"
 
 auth:
-#  server: "http://localhost:8081/oauth/v2/authorize"
-  server: "https://auth-dev.mastertime.io/oauth/v2/authorize"
+  server: "http://localhost:8081/oauth/v2/authorize"
+#  server: "https://auth-dev.mastertime.io/oauth/v2/authorize"
 #  server: "https://auth-demo.mastertime.io/oauth/v2/authorize"
 #  server: "https://auth.mastertime.io/oauth/v2/authorize"
 
 token:
-#  server: "http://localhost:8081/oauth/v2/token"
-  server: "https://auth-dev.mastertime.io/oauth/v2/token"
+  server: "http://localhost:8081/oauth/v2/token"
+#  server: "https://auth-dev.mastertime.io/oauth/v2/token"
 #  server: "https://auth-demo.mastertime.io/oauth/v2/token"
 #  server: "https://auth.mastertime.io/oauth/v2/token"
 

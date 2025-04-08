@@ -72,6 +72,10 @@ func main() {
 		Handler:      handlers.CORS(originsOk, headersOk, methodsOk)(r),
 	}
 	log.Printf("Listening on port %v..., http://localhost:%v/home\n", viper.GetInt("app.port"), viper.GetInt("app.port"))
+	log.Printf("Please run OAuth service (github.com/mastertech-hq/masterTime-OAuthService-Go) first. expected :")
+	log.Printf("\t- Auth: %s", viper.GetString("auth.server"))
+	log.Printf("\t- Token: %s", viper.GetString("token.server"))
+
 	log.Panic(sv.ListenAndServe())
 }
 
