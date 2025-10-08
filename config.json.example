@@ -1,0 +1,52 @@
+{
+    "app": {
+        "port": 8088,
+        "callback_uri": "http://localhost:8088/callback"
+    },
+    "clients": [
+        {
+            "name": "public client",
+            "client_id": "web_public",
+            "client_secret": "web_public_secret",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "scopes": "profile email openid",
+            "use_pkce": true,
+            "allow_plain_pkce": true,
+            "enabled": true
+        },
+        {
+            "name": "private client",
+            "client_id": "web_private",
+            "client_secret": "web_private_credential",
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "scopes": "profile email",
+            "use_pkce": false,
+            "allow_plain_pkce": false,
+            "enabled": true
+        }
+    ],
+    "login_buttons": [
+        {
+            "text": "OAuth login",
+            "path": "",
+            "enabled": true
+        },
+        {
+            "text": "User login",
+            "path": "/user",
+            "enabled": false
+        },
+        {
+            "text": "Admin login",
+            "path": "/admin",
+            "enabled": false
+        },
+        {
+            "text": "Employee login",
+            "path": "/employee",
+            "enabled": false
+        }
+    ]
+}

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Callback Success</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Sarabun:ital@1&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            padding: 2em;
+        }
+
+        label {
+            display: inline-block;
+            width: 10em;
+            text-align: right;
+            padding-right: 1em;
+        }
+
+        select {
+            width: 20em;
+            padding: 6px 10px;
+            margin: 4px 0;
+            box-sizing: border-box;
+            font-family: 'DM Mono', monospace;
+        }
+
+        option {
+            font-family: 'DM Mono', monospace;
+            padding: 1em;
+        }
+
+        .v-align-top {
+            vertical-align: top;
+        }
+
+        input[type=text], textarea {
+            width: 45em;
+            padding: 6px 10px;
+            margin: 4px 0;
+            box-sizing: border-box;
+            font-family: 'DM Mono', monospace;
+            border: #777 1px solid;
+        }
+
+        input[name="code"], input[name="state"] {
+            background-color: lightgreen;
+            font-weight: bold;
+        }
+
+        table#table_error input, table#table_error textarea {
+            background-color: mistyrose;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<h1>
+    Callback Success
+    <a class="btn" href="/home">🏠 Go back Home</a>
+</h1>
+
+<h3 style="margin-top: 2em;">Response form Authentication</h3>
+<table>
+    <tr>
+        <td>
+            <label for="code">code 🔢</label>
+        </td>
+        <td>
+            <input type="text" id="code" name="code" value="{{ .Code }}" disabled>
+        </td>
+        <td>
+            <input type="checkbox" id="use_code" name="use_code" value="1" checked> ใช้งาน
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="state">state 🏷️</label>
+        </td>
+        <td>
+            <input type="text" id="state" name="state" value="{{ .State }}" disabled>
+        </td>
+    </tr>
+</table>
+
+<h3 style="margin-top: 1em;">Other values for Token Request</h3>
+<table>
+    <tr>
+        <td>
+            <label for="token_endpoint">token_endpoint 🌐</label>
+        </td>
+        <td>
+            <input type="text" id="token_endpoint" name="token_endpoint" placeholder="token_endpoint"
+                   value="{{ .TokenServer }}" disabled>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="grant_type">grant_type 🔐</label>
+        </td>
+        <td>
+            <input type="text" id="grant_type" name="grant_type" placeholder="grant_type" value="{{ .GrantType }}">
+        </td>
+        <td>
+            <input type="checkbox" id="use_grant_type" name="use_grant_type" value="1" checked> ใช้งาน
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="client_name">client name 🖥️</label>
+        </td>
+        <td>
+            <input type="text" id="client_name" name="client_name" placeholder="client_name" value="{{ .ClientName }}">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="client_id">client_id 🆔</label>
+        </td>
+        <td>
+            <input type="text" id="client_id" name="client_id" placeholder="client_id" value="{{ .ClientID }}">
+        </td>
+        <td>
+            <input type="checkbox" id="use_client_id" name="use_client_id" value="1" checked> ใช้งาน
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="client_secret">client_secret 🔑</label>
+        </td>
+        <td>
+            <input type="text" id="client_secret" name="client_secret" placeholder=""
+                   value="{{ .ClientSecret }}">
+        </td>
+        <td>
+            <input type="checkbox" id="use_client_secret" name="use_client_secret" value="1"> ใช้งาน
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="redirect_uri">redirect_uri ↩️</label>
+        </td>
+        <td>
+            <input type="text" id="redirect_uri" name="redirect_uri" placeholder="redirect_uri"
+                   value="{{ .CallbackURL }}">
+        </td>
+        <td>
+            <input type="checkbox" id="use_redirect_uri" name="use_redirect_uri" value="1" checked> ใช้งาน
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="code_verifier">code_verifier 🛡️</label>
+        </td>
+        <td>
+            <input type="text" id="code_verifier" name="code_verifier" placeholder="code_verifier"
+                   value="{{ .CodeVerifier }}">
+        </td>
+        <td>
+            <input type="checkbox" id="use_code_verifier" name="use_code_verifier" value="1" checked> ใช้งาน
+        </td>
+    </tr>
+</table>
+
+<hr style="margin-top: 2em;">
+
+<h3 style="margin-top: 2em;">
+    Token
+    <a id="btn_get_token" class="btn rounded-md" href="#">Get Token with Authorization Code (code)</a>
+    <a id="btn_get_with_refresh"
+       class="hidden ml-2 border p-2 pl-6 pr-6 rounded-md bg-violet-300 hover:bg-violet-600 border-violet-600 text-violet-900 hover:text-white font-bold"
+       href="#">Get Token with Refresh Token</a>
+</h3>
+<table id="table_token" class="mt-4">
+    <tr>
+        <td class="v-align-top">
+            <label for="access_token">Access Token</label>
+        </td>
+        <td>
+            <textarea id="access_token" name="access_token" rows="10" cols="88" disabled></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="custom_parameter">custom_parameter</label>
+        </td>
+        <td>
+            <input type="text" id="custom_parameter" name="custom_parameter" placeholder=""
+                   value="">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="expires_in">expires_in</label>
+        </td>
+        <td>
+            <input type="text" id="expires_in" name="expires_in" placeholder=""
+                   value="">
+        </td>
+    </tr>
+    <tr>
+        <td class="v-align-top">
+            <label for="refresh_token">Refresh Token</label>
+        </td>
+        <td>
+            <textarea id="refresh_token" name="refresh_token" rows="10" cols="88" disabled></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="scope">scope</label>
+        </td>
+        <td>
+            <input type="text" id="scope" name="scope" placeholder=""
+                   value="">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="token_type">token_type</label>
+        </td>
+        <td>
+            <input type="text" id="token_type" name="token_type" placeholder=""
+                   value="">
+        </td>
+    </tr>
+</table>
+
+<table id="table_error" class="mt-4">
+    <tr>
+        <td>
+            <label for="error">error</label>
+        </td>
+        <td>
+            <input type="text" id="error" name="error" placeholder=""
+                   value="">
+        </td>
+    </tr>
+    <tr>
+        <td class="v-align-top">
+            <label for="error_description">error_description</label>
+        </td>
+        <td>
+            <textarea id="error_description" name="error_description" rows="10" cols="88" disabled></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label for="error_uri">error_uri</label>
+        </td>
+        <td>
+            <input type="text" id="error_uri" name="error_uri" placeholder=""
+                   value="">
+        </td>
+    </tr>
+</table>
+
+<script>
+    let clients = [];
+    {{ range .Clients }}
+    clients.push(
+        {
+            client_type: '{{ .ClientType }}',
+            client_id: '{{ .ClientID }}',
+            client_secret: '{{ .ClientSecret }}',
+        }
+    )
+    {{ end }}
+
+    let fnSetClient = function () {
+        let client_type = document.getElementById("client_type").value;
+        let client = clients.find((element) => {
+            return element.client_type === client_type;
+        });
+        document.getElementById("client_id").value = client.client_id;
+        document.getElementById("client_secret").value = client.client_secret;
+    }
+
+    function hiddenTokenResponseTable() {
+        document.getElementById("table_token").style.display = "none";
+        document.getElementById("table_error").style.display = "none";
+    }
+
+    document.getElementById("btn_get_token").onclick = function () {
+        let token_endpoint = document.getElementById("token_endpoint").value;
+
+        let grant_type = document.getElementById("grant_type").value;
+        let code = document.getElementById("code").value;
+        let redirect_uri = document.getElementById("redirect_uri").value;
+        let client_id = document.getElementById("client_id").value;
+        let client_secret = document.getElementById("client_secret").value;
+        let code_verifier = document.getElementById("code_verifier").value;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", token_endpoint, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            hiddenTokenResponseTable();
+
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("access_token").value = response.access_token;
+                document.getElementById("refresh_token").value = response.refresh_token;
+                document.getElementById("expires_in").value = response.expires_in;
+                document.getElementById("scope").value = response.scope;
+                document.getElementById("token_type").value = response.token_type;
+                document.getElementById("custom_parameter").value = response.custom_parameter;
+
+                document.getElementById("table_token").style.display = "table";
+                document.getElementById("btn_get_with_refresh").style.display = "inline";
+
+            } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("error").value = response.error;
+                document.getElementById("error_description").value = response.error_description;
+                document.getElementById("error_uri").value = response.error_uri === undefined ? '' : response.error_uri;
+
+                document.getElementById("table_error").style.display = "table";
+            }
+        };
+
+        let requestBody = ''
+        if (document.getElementById("use_grant_type").checked) {
+            requestBody += 'grant_type=' + encodeURI(grant_type);
+        }
+        if (document.getElementById("use_code").checked) {
+            if (requestBody !== '') {
+                requestBody += '&';
+            }
+            requestBody += 'code=' + encodeURI(code);
+        }
+        if (document.getElementById("use_redirect_uri").checked) {
+            if (requestBody !== '') {
+                requestBody += '&';
+            }
+            requestBody += 'redirect_uri=' + encodeURI(redirect_uri);
+        }
+
+        // client authentication
+        if (document.getElementById("use_client_secret").checked) {
+            // confidential
+            if (client_secret !== '') {
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(client_id + ":" + client_secret));
+            }
+
+        } else if (document.getElementById("use_client_id").checked) { // public client
+            if (requestBody !== '') {
+                requestBody += '&';
+            }
+            requestBody += 'client_id=' + encodeURI(client_id);
+        }
+
+        if (document.getElementById("use_code_verifier").checked) {
+            if (requestBody !== '') {
+                requestBody += '&';
+            }
+            requestBody += 'code_verifier=' + encodeURI(code_verifier);
+        }
+
+        xhr.send(requestBody);
+
+        return false;
+    };
+
+    document.getElementById("btn_get_with_refresh").onclick = function () {
+        let token_endpoint = document.getElementById("token_endpoint").value;
+
+        let grant_type = "refresh_token";
+        let refresh_token = document.getElementById("refresh_token").value;
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", token_endpoint, true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            hiddenTokenResponseTable();
+
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("access_token").value = response.access_token;
+                document.getElementById("refresh_token").value = response.refresh_token;
+                document.getElementById("expires_in").value = response.expires_in;
+                document.getElementById("scope").value = response.scope;
+                document.getElementById("token_type").value = response.token_type;
+                document.getElementById("custom_parameter").value = response.custom_parameter;
+
+                document.getElementById("table_token").style.display = "table";
+                document.getElementById("btn_get_with_refresh").style.display = "inline";
+
+            } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                var response = JSON.parse(xhr.response);
+                console.log(response);
+
+                document.getElementById("error").value = response.error;
+                document.getElementById("error_description").value = response.error_description;
+                document.getElementById("error_uri").value = response.error_uri === undefined ? '' : response.error_uri;
+
+                document.getElementById("table_error").style.display = "table";
+            }
+        };
+
+        let requestBody = ''
+        requestBody += 'grant_type=' + encodeURI(grant_type);
+        requestBody += '&refresh_token=' + encodeURI(refresh_token);
+
+        if (document.getElementById("use_client_id").checked) { // public client
+            requestBody += '&client_id=' + encodeURI(document.getElementById("client_id").value);
+        }
+
+        xhr.send(requestBody);
+
+        return false;
+    }
+
+    document.getElementById("client_type").addEventListener('change', (event) => {
+        fnSetClient();
+    });
+
+    // on load
+    fnSetClient();
+    hiddenTokenResponseTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth 2.0 Client</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Sarabun:ital@1&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+            padding: 2em;
+        }
+
+        label {
+            display: inline-block;
+            width: 10em;
+            text-align: right;
+            padding-right: 1em;
+        }
+
+        select {
+            width: 20em;
+            padding: 6px 10px;
+            margin: 4px 0;
+            box-sizing: border-box;
+            font-family: 'DM Mono', monospace;
+        }
+
+        option {
+            font-family: 'DM Mono', monospace;
+            padding: 1em;
+        }
+
+        input[type=text] {
+            width: 45em;
+            padding: 6px 10px;
+            margin: 4px 0;
+            box-sizing: border-box;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h1>OAuth 2.0 Client</h1>
+    <form>
+        <table>
+            <tr>
+                <td>
+                    <label for="auth_server">auth_endpoint 🌐</label>
+                </td>
+                <td>
+                    <input type="text" id="auth_server" name="auth_server" placeholder="auth_server"
+                           value="" disabled>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="client_name">client names 🖥️</label>
+                </td>
+                <td>
+                    <select id="client_name" name="client_name">
+                        {{ range .Clients }}
+                        <option value="{{ .Name }}">{{ .Name }}</option>
+                        {{ end }}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="client_id">client_id 🆔</label>
+                </td>
+                <td>
+                    <input type="text" id="client_id" name="client_id" placeholder="client_id" value="">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_client_id" name="use_client_id" value="1" checked> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="client_secret">client_secret 🔑</label>
+                </td>
+                <td>
+                    <input type="text" id="client_secret" name="client_secret" placeholder="client_secret"
+                           value="">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_client_secret" name="use_client_secret" value="1"> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="redirect_uri">redirect_uri ↩️</label>
+                </td>
+                <td>
+                    <input type="text" id="redirect_uri" name="redirect_uri" placeholder="redirect_uri"
+                           value="{{ .App.CallbackUri }}">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_redirect_uri" name="use_redirect_uri" value="1" checked> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="response_type">response_type 💬</label>
+                </td>
+                <td>
+                    <input type="text" id="response_type" name="response_type" placeholder="response_type" value="code">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_response_type" name="use_response_type" value="1" checked> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="scope">scope 🎯</label>
+                </td>
+                <td>
+                    <input type="text" id="scope" name="scope" placeholder="scope" value="">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_scope" name="use_scope" value="1" checked> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="state">state 🏷️</label>
+                </td>
+                <td>
+                    <input type="text" id="state" name="state" placeholder="state" value="">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_state" name="use_state" value="1" checked> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="code_challenge">code_challenge 🛡️</label>
+                </td>
+                <td>
+                    <input type="text" id="code_challenge" name="code_challenge" placeholder="code_challenge"
+                           value="">
+                </td>
+                <td>
+                    <input type="checkbox" id="use_code_challenge" name="use_code_challenge" value="1" checked> ใช้งาน
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="code_verifier">code_verifier 🛡️</label>
+                </td>
+                <td>
+                    <input type="text" id="code_verifier" name="code_verifier" placeholder="code_verifier"
+                           value="">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="code_challenge_method">code_challenge_method 🛡️</label>
+                </td>
+                <td>
+                    <input type="text" id="code_challenge_method" name="code_challenge_method" placeholder="code_challenge_method"
+                           value="">
+                </td>
+            </tr>
+        </table>
+    </form>
+    <div id="buttons" style="margin-top: 2em">
+        <a class="btn login_btn" href="authserver/user?">😊 Login User</a>
+    </div>
+</div>
+<script>
+    let clients = [];
+    {{ range .Clients }}
+    clients.push(
+        {
+            client_name: '{{ .Name }}',
+            client_id: '{{ .ClientId }}',
+            client_secret: '{{ .ClientSecret }}',
+            auth_uri: '{{ .AuthUri }}',
+            token_uri: '{{ .TokenUri }}',
+            state: '{{ .RandomState }}',
+            scope: '{{ .Scopes }}',
+            code_verifier: '{{ .RandomCodeVerifier }}',
+            code_challenge: '{{ .RandomCodeChallenge }}',
+            code_challenge_method: {{ .CodeChallengeMethod }},
+            redirect_uri: '{{ $.App.CallbackUri }}'
+        }
+    )
+    {{ end }}
+
+    let loginButtons = []
+    {{ range .LoginButtons }}
+    loginButtons.push(
+        {
+            text: '{{ .Text }}',
+            path: '{{ .Path }}',
+            enabled: {{ .Enabled }},
+        }
+    )
+    {{ end }}
+
+    console.log(clients);
+
+    let fnSetClient = function () {
+        console.log("fnSetClient")
+        let client_name = document.getElementById("client_name").value;
+        console.log(client_name)
+        let client = clients.find((element) => {
+            return element.client_name === client_name;
+        });
+        document.getElementById("client_id").value = client.client_id;
+        document.getElementById("client_secret").value = client.client_secret;
+        document.getElementById("auth_server").value = client.auth_uri;
+        document.getElementById("redirect_uri").value = window.location.origin + '/callback';
+        document.getElementById("state").value = client.state;
+        document.getElementById("scope").value = client.scope;
+        document.getElementById("code_challenge").value = client.code_challenge;
+        document.getElementById("code_verifier").value = client.code_verifier;
+        document.getElementById("code_challenge_method").value = client.code_challenge_method
+    }
+
+    let fnSetLoginBaseUrl = function () {
+        console.log("fnSetLoginBaseUrl")
+
+        let client_name = document.getElementById("client_name").value;
+        let client = clients.find((element) => {
+            return element.client_name === client_name;
+        });
+
+        buttons = document.getElementById("buttons");
+        buttons.innerHTML = '';
+
+        loginButtons.forEach((loginButton) => {
+            if (loginButton.enabled) {
+                let a = document.createElement('a');
+                a.className = 'btn login_btn';
+                console.log("url: " + client.auth_uri + loginButton.path);
+                a.href = client.auth_uri + loginButton.path + '?';
+                a.innerText = loginButton.text;
+                buttons.appendChild(a);
+            }
+        });
+    }
+
+    let fnSetLoginBtnHref = function () {
+        let qry = '?';
+        if (document.getElementById("use_client_id").checked) {
+            qry += 'client_id=' + encodeURI(document.getElementById("client_id").value) + '&';
+        }
+        if (document.getElementById("use_client_secret").checked) {
+            qry += 'client_secret=' + encodeURI(document.getElementById("client_secret").value) + '&';
+        }
+        if (document.getElementById("use_redirect_uri").checked) {
+            qry += 'redirect_uri=' + encodeURI(document.getElementById("redirect_uri").value) + '&';
+        }
+        if (document.getElementById("use_response_type").checked) {
+            qry += 'response_type=' + encodeURI(document.getElementById("response_type").value) + '&';
+        }
+        if (document.getElementById("use_scope").checked) {
+            qry += 'scope=' + encodeURI(document.getElementById("scope").value) + '&';
+        }
+        if (document.getElementById("use_state").checked) {
+            qry += 'state=' + encodeURI(document.getElementById("state").value) + '&';
+        }
+        if (document.getElementById("use_code_challenge").checked) {
+            qry += 'code_challenge=' + encodeURI(document.getElementById("code_challenge").value) + '&';
+            qry += 'code_challenge_method=S256';
+        }
+
+        let loginBtns = document.querySelectorAll('.login_btn');
+        loginBtns.forEach((element) => {
+            let href = element.getAttribute('href')
+            href = href.substring(0, href.indexOf('?'));
+            element.setAttribute('href', href + qry);
+        });
+    }
+
+    let checkboxes = document.querySelectorAll('input[type=checkbox]');
+    checkboxes.forEach((element) => {
+        element.addEventListener('change', (event) => {
+            fnSetLoginBaseUrl();
+            fnSetLoginBtnHref();
+        });
+    });
+
+    document.getElementById("client_name").addEventListener('change', (event) => {
+        fnSetClient();
+        fnSetLoginBaseUrl();
+        fnSetLoginBtnHref();
+    });
+
+    document.querySelectorAll('input[type=text]').forEach((element) => {
+        element.addEventListener('keyup', (event) => {
+            fnSetLoginBaseUrl
+            fnSetLoginBtnHref();
+        });
+    });
+
+    // on load
+    fnSetClient();
+    fnSetLoginBaseUrl();
+    fnSetLoginBtnHref();
+
+</script>
+</body>
+</html>
