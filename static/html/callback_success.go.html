@@ -271,40 +271,30 @@
 </table>
 
 <script>
-    let clients = [];
-    {{ range .Clients }}
-    clients.push(
-        {
-            client_type: '{{ .ClientType }}',
-            client_id: '{{ .ClientID }}',
-            client_secret: '{{ .ClientSecret }}',
-        }
-    )
-    {{ end }}
-
-    let fnSetClient = function () {
-        let client_type = document.getElementById("client_type").value;
-        let client = clients.find((element) => {
-            return element.client_type === client_type;
-        });
-        document.getElementById("client_id").value = client.client_id;
-        document.getElementById("client_secret").value = client.client_secret;
-    }
-
-    function hiddenTokenResponseTable() {
+    let hiddenTokenResponseTable =function() {
         document.getElementById("table_token").style.display = "none";
         document.getElementById("table_error").style.display = "none";
     }
 
     document.getElementById("btn_get_token").onclick = function () {
-        let token_endpoint = document.getElementById("token_endpoint").value;
+        console.log("Get Token with Authorization Code (code)");
 
+        let token_endpoint = document.getElementById("token_endpoint").value;
         let grant_type = document.getElementById("grant_type").value;
         let code = document.getElementById("code").value;
         let redirect_uri = document.getElementById("redirect_uri").value;
         let client_id = document.getElementById("client_id").value;
         let client_secret = document.getElementById("client_secret").value;
         let code_verifier = document.getElementById("code_verifier").value;
+
+        // log all values
+        console.log("token_endpoint: " + token_endpoint);
+        console.log("grant_type: " + grant_type);
+        console.log("code: " + code);
+        console.log("redirect_uri: " + redirect_uri);
+        console.log("client_id: " + client_id);
+        console.log("client_secret: " + client_secret);
+        console.log("code_verifier: " + code_verifier);
 
         let xhr = new XMLHttpRequest();
         xhr.open("POST", token_endpoint, true);
@@ -361,7 +351,6 @@
             if (client_secret !== '') {
                 xhr.setRequestHeader("Authorization", "Basic " + btoa(client_id + ":" + client_secret));
             }
-
         } else if (document.getElementById("use_client_id").checked) { // public client
             if (requestBody !== '') {
                 requestBody += '&';
@@ -386,6 +375,8 @@
 
         let grant_type = "refresh_token";
         let refresh_token = document.getElementById("refresh_token").value;
+        let client_id = document.getElementById("client_id").value;
+        let client_secret = document.getElementById("client_secret").value;
 
         let xhr = new XMLHttpRequest();
         xhr.open("POST", token_endpoint, true);
@@ -423,8 +414,17 @@
         requestBody += 'grant_type=' + encodeURI(grant_type);
         requestBody += '&refresh_token=' + encodeURI(refresh_token);
 
-        if (document.getElementById("use_client_id").checked) { // public client
-            requestBody += '&client_id=' + encodeURI(document.getElementById("client_id").value);
+        // client authentication
+        if (document.getElementById("use_client_secret").checked) {
+            // confidential
+            if (client_secret !== '') {
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(client_id + ":" + client_secret));
+            }
+        } else if (document.getElementById("use_client_id").checked) { // public client
+            if (requestBody !== '') {
+                requestBody += '&';
+            }
+            requestBody += 'client_id=' + encodeURI(client_id);
         }
 
         xhr.send(requestBody);
@@ -432,12 +432,6 @@
         return false;
     }
 
-    document.getElementById("client_type").addEventListener('change', (event) => {
-        fnSetClient();
-    });
-
-    // on load
-    fnSetClient();
     hiddenTokenResponseTable();
 </script>
 </body>
